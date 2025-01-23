@@ -1,0 +1,890 @@
+{
+	"info": {
+		"_postman_id": "905464c5-0a05-4648-a559-f4f588349417",
+		"name": "Testes End-to-End",
+		"description": "> This collection features end-to-end tests that ensure the Intergalactic Bank API components function in an expected sequence. Check out the [Functional testing collection](https://www.postman.com/templates/f26ad070-d626-4d75-b151-7cbf1a48ed11/Functional-testing) and [Integration testing collection](https://www.postman.com/templates/6f788c17-067a-4074-a528-d07df1df9529/Integration-testing-%23example) for other test cases for this API. \n  \n\n## **🪐 Get started**\n\nThe fictional Intergalactic Bank Services team is responsible for testing the end-to-end workflows in this collection. You can use this collection to validate specific workflows for your team or figure out ways to increase your test coverage and make your applications more resilient.\n\nTo test the Intergalactic Bank API, you can:\n\n1. **Review tests and scripts:** Check out the [tests](https://learning.postman.com/docs/writing-scripts/test-scripts/) in the Scripts tab of a collection, folder, or request. You’ll also find additional steps in the Pre-request Script, such as for passing data between requests or building up POST request payloads.\n    \n2. **Run tests:** To run the collection, select Run collection from the collection menu. If you are interested in testing one of the use cases, select Run folder from the use case folder menu. Keep in mind that many of these tests contain logic that passes information between requests, and they are meant to be run in order from top to bottom. If you send the requests manually or out of order, your results may vary.\n    \n3. **Review test results:** Many of the test cases contain error messages to help debug service errors. If you’re using this collection as a pre-merge check, ensure that all tests are passing before submitting (and no, deleting the failing test cases isn’t an option 😉).\n    \n\nCheck out the additional sections below or select View complete documentation. For context-sensitive help with a folder or request, look for the documentation icon.\n\n## 🧑‍💻How your team can use this collection\n\n- **Add a mock server to speed up development:** Adding functionality to this service? Since this collection has example responses, you can add a mock server that will return the expected results. Start writing tests against the mock, and once your additions are live, you can swap out the URLs and have a live test suite.\n    \n- **Integrate tests with your CI/CD pipeline:** This comprehensive test suite is a great addition to your existing CI/CD pipeline. Generate the Postman CLI command from the Collection Runner and add this step to your existing checks each time you make a commit affecting this service.\n    \n- **Add a monitor:** If your team is contributing to or relying on this service, it’s a good idea to keep tabs on the status. Adding a monitor to this collection can give you confidence that the service is up and running and alert you to any breaking changes that may have occurred.\n    \n\n## 🔍 What we’re testing\n\n- A very common workflow is the transfer of funds between accounts. We have two scenarios: one which creates all resources and successfully transfers funds, and one which tries the transfer with insufficient funds.\n    \n- During these workflows, we are testing for data correctness, data types, and that data is successfully passed through the system during creation and retrieval.\n    \n\n## 🔒A note on authorization\n\nThis API uses an API key-based authorization. In this collection, we set the authorization at the collection level and generate a new API Key for each test run.\n\n## 👀 View and share run results\n\nInterested in seeing previous run results? We’re happy to share, and have a few ways for you to stay in the loop:\n\n- **Runs tab:** View past collection runs in the `Runs` tab of this collection. Here, you can see the results of past runs, including who ran them and whether it was via the Collection Runner or the CLI. You can also share individual run reports from this page.\n    \n- **Monitors:** If you have a monitor set up for this collection, you can see historical run information when you select the Monitors tab in the left sidebar. You can also have the results sent to Slack or other services when you set up a corresponding integration.\n    \n\n### 🤝Increase test coverage\n\nThe Intergalactic Bank Services team wants your team to have everything they need to successfully test our services with their applications. Is your team utilizing this API in a use case not represented here? Reach out to us on our internal Slack by tagging `@bank-services`. Or add an [inline comment](https://learning.postman.com/docs/collaborating-in-postman/working-with-your-team/discussing-your-work/) to this collection with your test case suggestions.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14888416"
+	},
+	"item": [
+		{
+			"name": "Processo que valida a transação",
+			"item": [
+				{
+					"name": "01 - Gera uma nova chave",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json();",
+									"",
+									"pm.test(\"Deve retornar um objeto\", function () {",
+									"    pm.expect(response, 'A resposta não é um objeto').to.be.an('object');",
+									"});",
+									"",
+									"pm.test(\"Deve conter a propriedade `chaveAPI` na resposta\", function () {",
+									"    pm.expect(response, 'A resposta não contém a propriedade').to.haveOwnProperty('apiKey');",
+									"});",
+									"",
+									"pm.test(\"Deve retornar uma string para a propriedade `chaveAPI`\", function () {",
+									"    pm.expect(response.apiKey, 'A propriedade não é uma string').to.be.a('string');",
+									"});",
+									"",
+									"// Define a variável apenas se a resposta for bem-sucedida",
+									"if (pm.response.code === 200) {",
+									"    pm.collectionVariables.set('chaveAPI', response.apiKey);",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth"
+							]
+						},
+						"description": "This request generates a new API key and saves it to the collection variables if the request is successful."
+					},
+					"response": []
+				},
+				{
+					"name": "02 - Criar uma nova conta (FromAccount)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Deve ter um corpo de resposta com formato JSON válido\", function () {",
+									"    pm.expect(response).to.not.be.undefined;",
+									"});",
+									"",
+									"pm.test(\"Deve conter o objeto 'account' obrigatório na resposta\", function () {",
+									"    pm.expect(response).to.be.an('object');",
+									"    pm.expect(response.account).to.exist;",
+									"});",
+									"",
+									"pm.test(\"O objeto 'account' deve conter a propriedade `id` que é um inteiro não negativo\", function () {",
+									"    pm.expect(response.account.id).to.be.a('number').and.to.be.at.least(0);",
+									"});",
+									"",
+									"// Define a variável apenas se a resposta for bem-sucedida",
+									"if (pm.response.code === 200) {",
+									"    pm.collectionVariables.set(\"e2e_user_name_from\", JSON.parse(pm.request.body.raw).owner);",
+									"    pm.collectionVariables.set(\"e2e_user_account_id_from\", response.account.id);",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Gerar os dados do payload para a requisição de criação de usuário",
+									"",
+									"// Combina um nome e sobrenome aleatórios para criar o nome completo",
+									"let nomeCompleto = `${pm.variables.replaceIn(\"{{$randomFirstName}}\")} ${pm.variables.replaceIn(\"{{$randomLastName}}\")}`;",
+									"",
+									"// Cria o objeto payload que será usado no corpo da requisição",
+									"let payload = {",
+									"    \"owner\": `${nomeCompleto} - FromAccount`, // Define o dono da conta com o nome completo e um sufixo \" - FromAccount\"",
+									"    \"balance\": 50,                            // Define o saldo inicial da conta como 50",
+									"    \"currency\": \"R$\"                // Define a moeda da conta como \"Real\"",
+									"}",
+									"",
+									"// Converte o objeto payload para o formato JSON e armazena em uma variável temporária",
+									"pm.variables.set('payload', JSON.stringify(payload)); ",
+									"// A variável 'payload' pode ser usada na requisição, mas será descartada ao final do fluxo de execução.",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{{payload}}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/accounts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"accounts"
+							]
+						},
+						"description": "Generates a new account (`fromAccount`), that the funds will be transferred from, and saves the following information if the request is successful:\n\n- Account owner from the request body (saved as collection variable `e2e_user_name_from`)\n- Account id from the response body (saved as collection variable `e2e_user_account_id_from`)"
+					},
+					"response": []
+				},
+				{
+					"name": "03 - Criar uma nova conta (ToAccount)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"// Teste: Deve ter um corpo de resposta em formato JSON válido",
+									"pm.test(\"Deve ter um corpo de resposta em formato JSON válido\", function () {",
+									"    pm.expect(response).to.not.be.undefined;",
+									"});",
+									"",
+									"// Teste: Deve conter o objeto 'account' obrigatório na resposta",
+									"pm.test(\"Deve conter o objeto 'account' obrigatório na resposta\", function () {",
+									"    pm.expect(response).to.be.an('object');",
+									"    pm.expect(response.account).to.exist;",
+									"});",
+									"",
+									"// Teste: O objeto 'account' deve ter a propriedade `id`, que deve ser um número inteiro não negativo",
+									"pm.test(\"O objeto 'account' deve ter a propriedade `id`, que deve ser um número inteiro não negativo\", function () {",
+									"    pm.expect(response).to.be.an('object');",
+									"    pm.expect(response.account.id).to.be.a('number').and.to.be.at.least(0);",
+									"});",
+									"",
+									"// Define as variáveis apenas se a resposta for bem-sucedida",
+									"if (pm.response.code === 200) {",
+									"    pm.collectionVariables.set(\"e2e_user_name_to\", JSON.parse(pm.request.body.raw).owner);",
+									"    pm.collectionVariables.set(\"e2e_user_account_id_to\", response.account.id);",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Gerar os dados do payload para a requisição de criação de usuário",
+									"",
+									"let nomeCompleto = `${pm.variables.replaceIn(\"{{$randomFirstName}}\")} ${pm.variables.replaceIn(\"{{$randomLastName}}\")}`;",
+									"",
+									"let payload = {",
+									"    \"owner\": `${nomeCompleto} - ToAccount`, // Define o proprietário da conta com o nome completo e um sufixo \" - ToAccount\"",
+									"    \"balance\": 0,                           // Define o saldo inicial da conta como 0",
+									"    \"currency\": \"R$\"              // Define a moeda da conta como \"Real\"",
+									"}",
+									"",
+									"// Armazena o payload em uma variável de execução temporária",
+									"pm.variables.set('payload', JSON.stringify(payload));"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{{payload}}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/accounts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"accounts"
+							]
+						},
+						"description": "Generates another new account (`toAccount`), that the funds will be transferred to, and saves the following information if the request is successful:\n\n- Account owner from the request body (saved as collection variable `e2e_user_name_to`)\n- Account id from the response body (saved as collection variable `e2e_user_account_id_to`)"
+					},
+					"response": []
+				},
+				{
+					"name": "04 - Lista de todos as contas de usuários criadas",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"// Teste: Deve conter um 'array' de contas na resposta",
+									"pm.test(\"Deve conter um 'array' de contas na resposta\", function () {",
+									"    pm.expect(response.accounts).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/accounts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"accounts"
+							]
+						},
+						"description": "Get a list of all accounts to ensure the accounts were created and saved correctly."
+					},
+					"response": []
+				},
+				{
+					"name": "05 - Criar uma nova transação entre os usuários",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"// Teste: Deve exibir uma mensagem de transação bem-sucedida",
+									"pm.test(\"Deve exibir uma mensagem de transação bem-sucedida\", function () {",
+									"    pm.expect(response.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "api-key",
+								"value": "1234"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fromAccountId\": {{e2e_user_account_id_from}},\n    \"toAccountId\": {{e2e_user_account_id_to}},\n    \"amount\": 20,\n    \"currency\": \"R$\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/transactions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"transactions"
+							]
+						},
+						"description": "Create a new transaction between the `fromAccount` and `toAccount`"
+					},
+					"response": []
+				},
+				{
+					"name": "06 - Obter Todas as Transações para a Conta Destino (ToAccount)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"// Teste: Deve conter um 'array' de transações na resposta",
+									"pm.test(\"Deve conter um 'array' de transações na resposta\", function () {",
+									"    pm.expect(response.transactions).to.be.an('array');",
+									"});",
+									"",
+									"// Teste: Deve retornar os dados corretos da transação para o usuário `toAccount`",
+									"pm.test(\"Deve retornar os dados corretos da transação para o usuário `toAccount`\", function () {",
+									"    pm.expect(response.transactions[0]).to.be.an(\"object\"); // Verifica se a transação é um objeto",
+									"    pm.expect(response.transactions[0].id).to.be.an(\"number\"); // Verifica se o ID é um número",
+									"    pm.expect(response.transactions[0].createdAt).to.match(/(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2}).(\\d{3})Z/); // Verifica o formato da data de criação",
+									"    pm.expect(response.transactions[0].fromAccountId).to.eql(pm.collectionVariables.get(\"e2e_user_account_id_from\")); // Verifica o ID da conta de origem",
+									"    pm.expect(response.transactions[0].toAccountId).to.eql(pm.collectionVariables.get(\"e2e_user_account_id_to\")); // Verifica o ID da conta de destino",
+									"    pm.expect(response.transactions[0].currency).to.eql(\"R$\"); // Verifica a moeda da transação",
+									"    pm.expect(response.transactions[0].amount).to.eql(20); // Verifica o valor da transação",
+									"});",
+									"",
+									"// Armazena o ID da transação se a resposta for bem-sucedida",
+									"if (pm.response.code === 200) {",
+									"    pm.collectionVariables.set(\"e2e_transaction_id_to\", response.transactions[0].id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/transactions?toAccountId={{e2e_user_account_id_to}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "toAccountId",
+									"value": "{{e2e_user_account_id_to}}"
+								}
+							]
+						},
+						"description": "Get a list of all transactions to and from the `toAccount`"
+					},
+					"response": []
+				},
+				{
+					"name": "07 - Obter Uma Única Transação",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"// Teste: Deve conter um 'objeto' de transação na resposta",
+									"pm.test(\"Deve conter um 'objeto' de transação na resposta\", function () {",
+									"    pm.expect(response.transaction).to.be.an('object');",
+									"});",
+									"",
+									"// Teste: Deve retornar os dados corretos da transação para o usuário `toAccount`",
+									"pm.test(\"Deve retornar os dados corretos da transação para o usuário `toAccount`\", function () {",
+									"    pm.expect(response.transaction).to.be.an(\"object\"); // Verifica se a transação é um objeto",
+									"    pm.expect(response.transaction.id).to.be.an(\"number\"); // Verifica se o ID da transação é um número",
+									"    pm.expect(response.transaction.createdAt).to.match(/(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2}).(\\d{3})Z/); // Verifica o formato da data de criação",
+									"    pm.expect(response.transaction.fromAccountId).to.eql(pm.collectionVariables.get(\"e2e_user_account_id_from\")); // Verifica o ID da conta de origem",
+									"    pm.expect(response.transaction.toAccountId).to.eql(pm.collectionVariables.get(\"e2e_user_account_id_to\")); // Verifica o ID da conta de destino",
+									"    pm.expect(response.transaction.currency).to.eql(\"R$\"); // Verifica a moeda da transação",
+									"    pm.expect(response.transaction.amount).to.eql(20); // Verifica o valor da transação",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/transactions/:transactionId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"transactions",
+								":transactionId"
+							],
+							"variable": [
+								{
+									"key": "transactionId",
+									"value": "{{e2e_transaction_id_to}}"
+								}
+							]
+						},
+						"description": "Get the details of an individual transaction, using the first transaction id from the list of transactions obtained in step \\[6\\]."
+					},
+					"response": []
+				},
+				{
+					"name": "08 - Obter Saldo Atual dos Usuários - Conta Destino (ToAccount)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json(),",
+									"    account_id = parseInt(pm.collectionVariables.get(\"e2e_user_account_id_to\")),",
+									"    owner = pm.collectionVariables.get(\"e2e_user_name_to\");",
+									"",
+									"// Teste: Deve conter um 'objeto' de conta na resposta",
+									"pm.test(\"Deve conter um 'objeto' de conta na resposta\", function () {",
+									"    pm.expect(response.account).to.be.an('object');",
+									"});",
+									"",
+									"// Teste: Deve conter o ID correto da conta na resposta",
+									"pm.test(\"Deve conter o ID correto da conta na resposta\", function () {",
+									"    pm.expect(response.account.id).to.eql(account_id);",
+									"});",
+									"",
+									"// Teste: Deve conter o proprietário correto na resposta",
+									"pm.test(\"Deve conter o proprietário correto na resposta\", function () {",
+									"    pm.expect(response.account.owner).to.eql(owner);",
+									"});",
+									"",
+									"// Teste: Deve conter o saldo correto na resposta",
+									"pm.test(\"Deve conter o saldo correto na resposta\", function () {",
+									"    pm.expect(response.account.balance).to.eql(20);",
+									"});",
+									"",
+									"// Teste: Deve conter a moeda correta na resposta",
+									"pm.test(\"Deve conter a moeda correta na resposta\", function () {",
+									"    pm.expect(response.account.currency).to.eql(\"R$\");",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/accounts/:accountId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"accounts",
+								":accountId"
+							],
+							"variable": [
+								{
+									"key": "accountId",
+									"value": "{{e2e_user_account_id_to}}"
+								}
+							]
+						},
+						"description": "Confirm the balance of the `toAccount` matches the expected value after the transaction."
+					},
+					"response": []
+				},
+				{
+					"name": "09 - Obter Saldo Atual dos Usuários - Conta de Origem (FromAccount)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json(),",
+									"    account_id = parseInt(pm.collectionVariables.get(\"e2e_user_account_id_from\")),",
+									"    owner = pm.collectionVariables.get(\"e2e_user_name_from\");",
+									"",
+									"// Teste: Deve conter um 'objeto' de conta na resposta",
+									"pm.test(\"Deve conter um 'objeto' de conta na resposta\", function () {",
+									"    pm.expect(response.account).to.be.an('object');",
+									"});",
+									"",
+									"// Teste: Deve conter o ID correto da conta na resposta",
+									"pm.test(\"Deve conter o ID correto da conta na resposta\", function () {",
+									"    pm.expect(response.account.id).to.eql(account_id);",
+									"});",
+									"",
+									"// Teste: Deve conter o proprietário correto na resposta",
+									"pm.test(\"Deve conter o proprietário correto na resposta\", function () {",
+									"    pm.expect(response.account.owner).to.eql(owner);",
+									"});",
+									"",
+									"// Teste: Deve conter o saldo correto na resposta",
+									"pm.test(\"Deve conter o saldo correto na resposta\", function () {",
+									"    pm.expect(response.account.balance).to.eql(30);",
+									"});",
+									"",
+									"// Teste: Deve conter a moeda correta na resposta",
+									"pm.test(\"Deve conter a moeda correta na resposta\", function () {",
+									"    pm.expect(response.account.currency).to.eql(\"R$\");",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/accounts/:accountId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"accounts",
+								":accountId"
+							],
+							"variable": [
+								{
+									"key": "accountId",
+									"value": "{{e2e_user_account_id_from}}"
+								}
+							]
+						},
+						"description": "Confirm the balance of the `fromAccount` matches the expected value after the transaction."
+					},
+					"response": []
+				},
+				{
+					"name": "10 - Excluir a Conta de Usuário - Conta Destino (ToAccount)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/accounts/:accountId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"accounts",
+								":accountId"
+							],
+							"variable": [
+								{
+									"key": "accountId",
+									"value": "{{e2e_user_account_id_to}}"
+								}
+							]
+						},
+						"description": "Delete the `toAccount` account to clean up after this test case."
+					},
+					"response": []
+				},
+				{
+					"name": "11 - Excluir a Conta de Usuário - FromAccount",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Limpe todas as variáveis agora que a execução da pasta terminou",
+									"pm.collectionVariables.unset(\"e2e_transaction_id_to\")",
+									"pm.collectionVariables.unset(\"e2e_user_account_id_from\")",
+									"pm.collectionVariables.unset(\"e2e_user_account_id_to\")",
+									"pm.collectionVariables.unset(\"e2e_user_name_from\")",
+									"pm.collectionVariables.unset(\"e2e_user_name_to\")",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/accounts/:accountId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"accounts",
+								":accountId"
+							],
+							"variable": [
+								{
+									"key": "accountId",
+									"value": "{{e2e_user_account_id_from}}"
+								}
+							]
+						},
+						"description": "Delete the `fromAccount` account and clear out the collection variables we created during this test case."
+					},
+					"response": []
+				}
+			],
+			"description": "Esta pasta testa um fluxo de trabalho comumente utilizado para criar novas contas e transferir fundos entre elas.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"//all requests in this folder should be valid",
+							"pm.test(\"Folder-level status check\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "key",
+				"value": "api-key",
+				"type": "string"
+			},
+			{
+				"key": "value",
+				"value": "{{apiKey}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://template.postman-echo.com",
+			"type": "string"
+		},
+		{
+			"key": "apiKey",
+			"value": "OMpqVWAH.UC80wyXTtPwhDgAUdCTx6"
+		},
+		{
+			"key": "chaveAPI",
+			"value": ""
+		}
+	]
+}
