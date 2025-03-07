@@ -1,0 +1,110 @@
+{
+	"info": {
+		"_postman_id": "3447c2a0-a7b7-44f1-9f12-86ac3f860250",
+		"name": "postmanLabsTests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14888416"
+	},
+	"item": [
+		{
+			"name": "Requisição retorna todos os registros",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Obter o corpo da resposta\r",
+							"const response = pm.response.json();\r",
+							"\r",
+							"// Verificar se a resposta é um array e contém pelo menos um item\r",
+							"if (Array.isArray(response) && response.length > 0) {\r",
+							"    // Salva o campo id do primeiro registro em uma variável de ambiente\r",
+							"    pm.environment.set(\"id\", response[0].id);\r",
+							"} else {\r",
+							"    console.log(\"A resposta não contém um array ou está vazio.\");\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{urlApi}}/posts",
+					"host": [
+						"{{urlApi}}"
+					],
+					"path": [
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Requisição retorna o primeiro registro",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Código de status é 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Obter o corpo da resposta\r",
+							"const response = pm.response.json();\r",
+							"\r",
+							"// Verificar se a resposta é um objeto e não está vazia\r",
+							"if (response && typeof response === 'object') {\r",
+							"\r",
+							"    // Salva o campo title e body em uma variável de ambiente\r",
+							"    pm.environment.set(\"title\", response.title);\r",
+							"    pm.environment.set(\"body\", response.body);\r",
+							"\r",
+							"    // Obter o title e o body salvo na variável de ambiente\r",
+							"    const savedTitle = pm.environment.get(\"title\");\r",
+							"    const savedbody = pm.environment.get(\"body\");\r",
+							"\r",
+							"    // Comparar o title salvo com o title da resposta\r",
+							"    pm.test(\"O título corresponde à resposta\", function () {\r",
+							"        pm.expect(savedTitle).to.eql(response.title);\r",
+							"    });\r",
+							"\r",
+							"    pm.test(\"O body corresponde à resposta\", function () {\r",
+							"        pm.expect(savedbody).to.eql(response.body);\r",
+							"    });\r",
+							"} else {\r",
+							"    console.log(\"A resposta não é um objeto ou está vazia.\");\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{urlApi}}/posts/{{id}}",
+					"host": [
+						"{{urlApi}}"
+					],
+					"path": [
+						"posts",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
