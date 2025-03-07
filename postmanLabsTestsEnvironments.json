@@ -1,0 +1,51 @@
+{
+	"id": "09cfcf41-583a-4c31-b1da-f0358364d6ab",
+	"name": "postmanLabsTestsEnvironments",
+	"values": [
+		{
+			"key": "urlApi",
+			"value": "https://jsonplaceholder.typicode.com",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "nomeEmissor",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "documentoEmissor",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "idEmissor",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "id",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "title",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "body",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2025-03-07T21:11:56.074Z",
+	"_postman_exported_using": "Postman/11.35.4"
+}
