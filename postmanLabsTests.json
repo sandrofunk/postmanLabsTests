@@ -105,6 +105,180 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Requisição retorna os registros de ID igual à 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Código de status é 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Obter o corpo da resposta\r",
+							"const response = pm.response.json();\r",
+							"\r",
+							"// Verificar se a resposta é um objeto e não está vazia\r",
+							"if (response && typeof response === 'object') {\r",
+							"\r",
+							"    // Salva o campo title e body em uma variável de ambiente\r",
+							"    pm.environment.set(\"title\", response.title);\r",
+							"    pm.environment.set(\"body\", response.body);\r",
+							"\r",
+							"    // Obter o title e o body salvo na variável de ambiente\r",
+							"    const savedTitle = pm.environment.get(\"title\");\r",
+							"    const savedbody = pm.environment.get(\"body\");\r",
+							"\r",
+							"    // Comparar o title salvo com o title da resposta\r",
+							"    pm.test(\"O título corresponde à resposta\", function () {\r",
+							"        pm.expect(savedTitle).to.eql(response.title);\r",
+							"    });\r",
+							"\r",
+							"    pm.test(\"O body corresponde à resposta\", function () {\r",
+							"        pm.expect(savedbody).to.eql(response.body);\r",
+							"    });\r",
+							"} else {\r",
+							"    console.log(\"A resposta não é um objeto ou está vazia.\");\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{urlApi}}/posts/{{id}}/comments",
+					"host": [
+						"{{urlApi}}"
+					],
+					"path": [
+						"posts",
+						"{{id}}",
+						"comments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Requisição retorna os registros de POSTID igual à 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Código de status é 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Obter o corpo da resposta\r",
+							"const response = pm.response.json();\r",
+							"\r",
+							"// Verificar se a resposta é um objeto e não está vazia\r",
+							"if (response && typeof response === 'object') {\r",
+							"\r",
+							"    // Salva o campo title e body em uma variável de ambiente\r",
+							"    pm.environment.set(\"title\", response.title);\r",
+							"    pm.environment.set(\"body\", response.body);\r",
+							"\r",
+							"    // Obter o title e o body salvo na variável de ambiente\r",
+							"    const savedTitle = pm.environment.get(\"title\");\r",
+							"    const savedbody = pm.environment.get(\"body\");\r",
+							"\r",
+							"    // Comparar o title salvo com o title da resposta\r",
+							"    pm.test(\"O título corresponde à resposta\", function () {\r",
+							"        pm.expect(savedTitle).to.eql(response.title);\r",
+							"    });\r",
+							"\r",
+							"    pm.test(\"O body corresponde à resposta\", function () {\r",
+							"        pm.expect(savedbody).to.eql(response.body);\r",
+							"    });\r",
+							"} else {\r",
+							"    console.log(\"A resposta não é um objeto ou está vazia.\");\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{urlApi}}/comments?postId={{id}}",
+					"host": [
+						"{{urlApi}}"
+					],
+					"path": [
+						"comments"
+					],
+					"query": [
+						{
+							"key": "postId",
+							"value": "{{id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Requisição retorna os registros de POSTID igual à 1 Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Código de status é 201 - Criado com Sucesso\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// Obter o corpo da resposta\r",
+							"const response = pm.response.json();\r",
+							"\r",
+							"// Verificar se a resposta é um objeto e não está vazia\r",
+							"if (response && typeof response === 'object') {\r",
+							"\r",
+							"    // Salva o campo id em uma variável de ambiente\r",
+							"    pm.environment.set(\"id\", response.id);\r",
+							"\r",
+							"    // Obter o id salvo na variável de ambiente\r",
+							"    const savedid = pm.environment.get(\"id\");\r",
+							"\r",
+							"    // Comparar o id salvo com o id da resposta\r",
+							"    pm.test(\"O id corresponde à resposta\", function () {\r",
+							"        pm.expect(savedid).to.eql(response.id);\r",
+							"    });\r",
+							"    \r",
+							"} else {\r",
+							"    console.log(\"A resposta não é um objeto ou está vazia.\");\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{urlApi}}/posts",
+					"host": [
+						"{{urlApi}}"
+					],
+					"path": [
+						"posts"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
