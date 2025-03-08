@@ -43,9 +43,15 @@
 			"value": "",
 			"type": "any",
 			"enabled": true
+		},
+		{
+			"key": "idCadastro",
+			"value": "",
+			"type": "any",
+			"enabled": true
 		}
 	],
 	"_postman_variable_scope": "environment",
-	"_postman_exported_at": "2025-03-07T21:11:56.074Z",
+	"_postman_exported_at": "2025-03-08T11:10:11.224Z",
 	"_postman_exported_using": "Postman/11.35.4"
 }
